@@ -23,25 +23,19 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Setup Gradle (fallback)
-        uses: gradle/actions/setup-gradle@v4
-
       - name: Prepare and Build APK
         run: |
           if [ -f "package.json" ]; then
             npm install --legacy-peer-deps
           fi
 
-          # Если это Expo-проект без папки android, генерируем ее
           if [ ! -d "android" ] && grep -q '"expo"' package.json 2>/dev/null; then
             npx expo prebuild --platform android --non-interactive
           fi
 
-          # Ищем gradlew или build.gradle в репозитории
           GRADLEW_PATH=$(find . -maxdepth 4 -name "gradlew" | head -n 1)
           if [ -n "$GRADLEW_PATH" ]; then
             GRADLE_DIR=$(dirname "$GRADLEW_PATH")
-            echo "Найден gradlew в: $GRADLE_DIR"
             cd "$GRADLE_DIR"
             chmod +x gradlew
             ./gradlew assembleDebug
@@ -49,14 +43,12 @@ jobs:
             GRADLE_FILE=$(find . -maxdepth 4 \( -name "build.gradle" -o -name "build.gradle.kts" \) | head -n 1)
             if [ -n "$GRADLE_FILE" ]; then
               GRADLE_DIR=$(dirname "$GRADLE_FILE")
-              echo "Найден build.gradle в: $GRADLE_DIR, генерируем wrapper..."
               cd "$GRADLE_DIR"
-              gradle wrapper
+              gradle wrapper --gradle-version 8.7
               chmod +x gradlew
               ./gradlew assembleDebug
             else
-              echo "ОШИБКА: Файлы Android-проекта не найдены. Содержимое корня:"
-              ls -la
+              echo "ОШИБКА: Файлы Android-проекта не найдены"
               exit 1
             fi
           fi
