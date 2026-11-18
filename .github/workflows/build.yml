@@ -28,6 +28,7 @@ jobs:
           GRADLE_FILE=$(find . -maxdepth 4 \( -name "build.gradle" -o -name "build.gradle.kts" \) | head -n 1)
           GRADLE_DIR=$(dirname "$GRADLE_FILE")
           cd "$GRADLE_DIR"
+          grep -q "android.useAndroidX" gradle.properties 2>/dev/null || echo -e "\nandroid.useAndroidX=true\nandroid.enableJetifier=true" >> gradle.properties
           gradle assembleDebug --console=plain
 
       - name: Upload APK
