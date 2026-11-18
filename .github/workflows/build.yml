@@ -23,6 +23,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
       - name: Prepare and Build APK
         run: |
           if [ -f "package.json" ]; then
@@ -44,9 +49,7 @@ jobs:
             if [ -n "$GRADLE_FILE" ]; then
               GRADLE_DIR=$(dirname "$GRADLE_FILE")
               cd "$GRADLE_DIR"
-              gradle wrapper --gradle-version 8.7
-              chmod +x gradlew
-              ./gradlew assembleDebug
+              gradle assembleDebug
             else
               echo "ОШИБКА: Файлы Android-проекта не найдены"
               exit 1
