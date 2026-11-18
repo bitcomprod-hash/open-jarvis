@@ -125,10 +125,10 @@ class MCPClient(
                 })
             }.toString()
             
-            val request = Request.Builder()
+                        val request = Request.Builder()
                 .url(server.url)
                 .post(okhttp3.RequestBody.create(
-                    "application/json".toByteArray().to okhttp3.MediaType.get("application/json"),
+                    okhttp3.MediaType.get("application/json"),
                     requestBody
                 ))
                 .build()
