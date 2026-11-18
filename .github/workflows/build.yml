@@ -25,16 +25,11 @@ jobs:
 
       - name: Build Debug APK
         run: |
-          ROOT_FILE=$(find . -maxdepth 3 \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -n 1)
-          ROOT_DIR=$(dirname "$ROOT_FILE")
-          cd "$ROOT_DIR"
           printf "\norg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n" >> gradle.properties
-          for f in $(grep -rl "defaultConfig" .); do
-            echo "Добавляем Material в: $f"
-            printf '\ndependencies {\n    implementation("com.google.android.material:material:1.11.0")\n}\n' >> "$f"
-          done
+          printf '\ndependencies {\n    implementation("com.google.android.material:material:1.11.0")\n}\n' >> app/build.gradle
           gradle assembleDebug --no-daemon --console=plain > build.log 2>&1 || {
-            grep -B 2 -A 10 "What went wrong:" build.log || tail -n 30 build.log
+            grep -E "^e: |Caused by:" build.log | head -n 25
+            grep -B 15 -A 8 "What went wrong:" build.log || tail -n 30 build.log
             exit 1
           }
 
